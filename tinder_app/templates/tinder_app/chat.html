@@ -1,0 +1,44 @@
+{% extends 'layout/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Чат{% endblock %}
+{% block content %}
+{% if messages %}
+{% for message in messages %}
+
+
+{% if message.author != profile %}
+<div class="container">
+  <p>{{message.author.firstname}}</p>
+  <img src="{{ message.author.main_photo.url }}" alt="Avatar">
+  <p>{{message.message}}</p>
+  <span class="time-right">{{message.pub_date}}</span>
+</div>
+
+{% elif message.author == profile %}
+<div class="container darker">
+  <p>{{profile.firstname}}</p>
+  <img src="{{ profile.main_photo.url }}" alt="Avatar" class="right">
+  <p>{{message.message}}</p>
+  <span class="time-left">{{message.pub_date}}</span>
+  <br>
+    <a href="{% url 'delete_message' message.id %}">Удалить сообщение</a>
+
+
+</div>
+
+{% endif %}
+
+
+{% endfor %}
+{% else %}
+<h2>Сообщений пока нет, но вы можете написать</h2>
+{% endif %}
+<form action="" method="post">
+  {% csrf_token %}
+  {{form|crispy}}
+  <input style="margin-top: 20px" type="submit" class="btn btn-success" value="Отправить">
+</form>
+
+
+{% endblock %}

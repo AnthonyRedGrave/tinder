@@ -1,0 +1,17 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Ваши лайки{% endblock %}
+
+{% block content %}
+{% if likes %}
+{% for like in likes %}
+<h2>Вы понравились пользователю: {{like.user_from}}</h2>
+<form action="" method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary" name="sympathy" value="{{ like.id }}">Это взаимно</button>
+</form>
+{% endfor %}
+{% else %}
+<h2>У вас пока нет симпатий</h2>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Это взаимно{% endblock %}
+
+{% block content %}
+{% if reciprocites %}
+{% for reciprocity in reciprocites %}
+{% if reciprocity.user_1 == profile %}
+<h2>{{reciprocity.user_2}}</h2>
+<div class="card" style="width: 18rem;">
+<!--    {% for im in profile.profilephoto.all %}-->
+<!--  <img src="{{ im.image.url }}" class="card-img-top" alt="Картинка не найдена" width="90" height="400">-->
+<!--    {% endfor %}-->
+  <img src="{{ reciprocity.user_2.main_photo.url }}" class="card-img-top" alt="Картинка не найдена">
+  <div class="card-body">
+    <h5 class="card-title">{{reciprocity.user_2.nickname}}</h5>
+    {% if reciprocity.user_2.description %}
+    <p class="card-text">{{reciprocity.user_2.description}}.</p>
+    {% else %}
+    <p class="card-text">Нет описания.</p>
+    {% endif %}
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Имя: {{reciprocity.user_2.firstname}}</li>
+    <li class="list-group-item">Фамилия: {{reciprocity.user_2.lastname}}</li>
+    <li class="list-group-item">Местоположение: {{reciprocity.user_2.location}}</li>
+  </ul>
+
+</div>
+{% else %}
+<h2>{{reciprocity.user_1}}</h2>
+<div class="card" style="width: 18rem;">
+<!--    {% for im in profile.profilephoto.all %}-->
+<!--  <img src="{{ im.image.url }}" class="card-img-top" alt="Картинка не найдена" width="90" height="400">-->
+<!--    {% endfor %}-->
+  <img src="{{ reciprocity.user_1.main_photo.url }}" class="card-img-top" alt="Картинка не найдена">
+  <div class="card-body">
+    <h5 class="card-title">{{reciprocity.user_1.nickname}}</h5>
+    {% if reciprocity.user_1.description %}
+    <p class="card-text">{{reciprocity.user_1.description}}.</p>
+    {% else %}
+    <p class="card-text">Нет описания.</p>
+    {% endif %}
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Имя: {{reciprocity.user_1.firstname}}</li>
+    <li class="list-group-item">Фамилия: {{reciprocity.user_1.lastname}}</li>
+    <li class="list-group-item">Местоположение: {{reciprocity.user_1.location}}</li>
+  </ul>
+
+</div>
+{% endif %}
+
+{% endfor %}
+{% else %}
+<h2>Взаимностей нет</h2>
+{% endif %}
+{% endblock %}

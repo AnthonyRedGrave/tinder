@@ -1,0 +1,52 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Профиль пользователя{% endblock %}
+
+{% block content %}
+
+
+
+<div class="card" style="width: 18rem;">
+<!--    {% for im in profile.profilephoto.all %}-->
+<!--  <img src="{{ im.image.url }}" class="card-img-top" alt="Картинка не найдена" width="90" height="400">-->
+<!--    {% endfor %}-->
+<!--  <img src="{{ profile.main_photo.url }}" class="card-img-top" alt="Картинка не найдена">-->
+    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        {% for im in profile.profilephoto.all %}
+        {% if forloop.first %}
+        <div class="carousel-item active">
+            <img src="{{ im.image.url }}" class="d-block w-100" alt="...">
+        </div>
+        {% else %}
+        <div class="carousel-item">
+            <img src="{{ im.image.url }}" class="d-block w-100" alt="...">
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+  <div class="card-body">
+    <h5 class="card-title">{{profile.nickname}}</h5>
+    <p class="card-text">{{profile.description}}.</p>
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Имя: {{profile.firstname}}</li>
+    <li class="list-group-item">Фамилия: {{profile.lastname}}</li>
+    <li class="list-group-item">Местоположение: {{profile.location}}</li>
+  </ul>
+  <div class="card-body">
+    <a href="#" class="card-link">Изменить информацию</a>
+  </div>
+</div>
+
+
+{% endblock %}

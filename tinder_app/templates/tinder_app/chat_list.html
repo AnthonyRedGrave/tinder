@@ -1,0 +1,16 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Все чаты{% endblock %}
+
+{% block content %}
+{% for chat in chats %}
+<div class="container">
+    {% if chat.member_2 == profile %}
+    <a href="{% url 'chat' chat.id %}">{{ chat.member_1.nickname }}</a>
+    {% else %}
+    <a href="{% url 'chat' chat.id %}">{{ chat.member_2.nickname }}</a>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% endblock %}

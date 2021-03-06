@@ -1,0 +1,9 @@
+{% extends 'layout/base.html' %}
+{% block title %}Удаление сообщения{% endblock %}
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    <h2>Вы действительно хотите удалить свое сообщение <<{{ message.message }}>>?</h2>
+    <button type="submit" class="btn btn-danger">Удалить сообщение</button>
+</form>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'layout/base.html' %}
+{% block content %}
+{% if request.user.is_authenticated %}
+<div class="container">
+  {% for profile in profiles %}
+<div class="card" style="width: 18rem;">
+<!--    {% for im in profile.profilephoto.all %}-->
+<!--  <img src="{{ im.image.url }}" class="card-img-top" alt="Картинка не найдена" width="90" height="400">-->
+<!--    {% endfor %}-->
+  <img src="{{ profile.main_photo.url }}" class="card-img-top" alt="Картинка не найдена">
+  <div class="card-body">
+    <h5 class="card-title">{{profile.nickname}}</h5>
+    {% if profile.description %}
+    <p class="card-text">{{profile.description}}.</p>
+    {% else %}
+    <p class="card-text">Нет описания.</p>
+    {% endif %}
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Имя: {{profile.firstname}}</li>
+    <li class="list-group-item">Фамилия: {{profile.lastname}}</li>
+    <li class="list-group-item">Местоположение: {{profile.location}}</li>
+  </ul>
+  <div class="card-body">
+    <form action="" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger" name="unlike" value="{{ profile.nickname }}">Не нравится</button>
+      <button type="submit" class="btn btn-primary" name="like" value="{{ profile.nickname }}">Нравится</button>
+    </form>
+  </div>
+</div>
+  {% endfor %}
+  </div>
+{% else %}
+<h2><a href="{% url 'login' %}">Войдите</a> или <a href="{% url 'registration' %}">зарегестрируйтесь</a></h2>
+{% endif %}
+{% endblock %}

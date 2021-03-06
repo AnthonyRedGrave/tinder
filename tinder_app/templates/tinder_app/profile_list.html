@@ -1,0 +1,31 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Список всех профилей{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% for profile in profiles %}
+<div class="card" style="width: 18rem;">
+  <img src="{{ profile.main_photo.url }}" class="card-img-top" alt="Картинка не найдена"">
+  <div class="card-body">
+    <h5 class="card-title">{{profile.nickname}}</h5>
+    {% if profile.description %}
+    <p class="card-text">{{profile.description}}.</p>
+    {% else %}
+    <p class="card-text">Нет описания.</p>
+    {% endif %}
+  </div>
+  <ul class="list-group list-group-flush">
+    <li class="list-group-item">Имя: {{profile.firstname}}</li>
+    <li class="list-group-item">Фамилия: {{profile.lastname}}</li>
+    <li class="list-group-item">Местоположение: {{profile.location}}</li>
+  </ul>
+  <div class="card-body">
+    <a href="#" class="card-link">Подробный профиль</a>
+    <a href="#" class="card-link">Another link</a>
+  </div>
+</div>
+  {% endfor %}
+  </div>
+
+{% endblock %}

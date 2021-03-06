@@ -1,0 +1,17 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}Ваши лайки{% endblock %}
+
+{% block content %}
+{% if likes %}
+{% for like in likes %}
+<h2>Вам понравился пользователь: {{like.user_to}}</h2>
+<form action="{% url 'delete_like' like.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Удалить лайк</button>
+</form>
+{% endfor %}
+{% else %}
+<h2>У вас пока нет симпатий</h2>
+{% endif %}
+{% endblock %}

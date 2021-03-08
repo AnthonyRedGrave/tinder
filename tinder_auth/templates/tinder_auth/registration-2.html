@@ -1,10 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'layout/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}
+Заполнение информации о пользователе
+{% endblock %}
+
+{% block content %}
+<h2>{{profile}}, заполните информацию о себе или дополните ее!</h2>
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.main_photo|as_crispy_field }}
+    {{ form.description|as_crispy_field }}
+    {{ form.sub_type|as_crispy_field }}
+    <input style="margin-top: 20px" type="submit" class="btn btn-success" value="Дополнить информацию">
+</form>
+{% endblock %}

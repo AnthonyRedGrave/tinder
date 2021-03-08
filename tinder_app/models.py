@@ -10,14 +10,21 @@ class Profile(models.Model):
         ('Woman', 'Женщина'),
     )
 
+    SUBSCRIPTION_TYPES = (
+        ('1', 'Базовая'),
+        ('2', 'Вип'),
+        ('3', 'Премиум'),
+    )
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     nickname = models.CharField('Никнейм', max_length=150)
     firstname = models.CharField('Имя', max_length=150)
     lastname = models.CharField('Фамилия', max_length=150)
     location = models.CharField('Локация', max_length=150, null=True, blank=True)
     description = models.CharField('Описание', max_length=150, null=True, blank=True)
-    type = models.CharField('Пол', choices=TYPES, max_length=6)
+    type = models.CharField('Пол', choices=TYPES, max_length=10)
     main_photo = models.ImageField('Главное фото', upload_to='mainphoto/', null=True, blank=True)
+    sub_type = models.CharField('Тип подписки', choices=SUBSCRIPTION_TYPES, max_length=10, default=1)
 
     def __str__(self):
         return 'Профиль: {}'.format(self.nickname)
@@ -26,7 +33,6 @@ class Profile(models.Model):
         verbose_name = 'Профиль пользователя'
         verbose_name_plural = 'Профиля пользователей'
         ordering = ['nickname']
-
 
 
 class ProfilePhoto(models.Model):
@@ -64,6 +70,7 @@ class UnLike(models.Model):
         return '{} - {}'.format(self.user_from, self.user_to)
 
     class Meta:
+        unique_together = ('user_from', 'user_to')
         verbose_name = 'Дизлайк'
         verbose_name_plural = 'Дизлайки'
 
@@ -77,6 +84,7 @@ class Reciprocity(models.Model):
         return 'Взаимность между {} - {}'.format(self.user_1, self.user_2)
 
     class Meta:
+        unique_together = ('user_1', 'user_2')
         verbose_name = 'Взаимность'
         verbose_name_plural = 'Взаимности'
 
@@ -93,6 +101,7 @@ class Chat(models.Model):
         return reverse('chat', kwargs={'id': self.id})
 
     class Meta:
+        unique_together = ('member_1', 'member_2')
         verbose_name = 'Чат'
         verbose_name_plural = 'Чат'
 

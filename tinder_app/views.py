@@ -1,5 +1,4 @@
-import json
-
+from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from .models import *
@@ -11,49 +10,21 @@ from .services import *
 from django.db.models import Q
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class ProfilesListForToday(View):
+class ProfilesListForToday(LoginRequiredMixin, View):
     def get(self, request):
-        if not request.user.is_authenticated:
-            return render(request, 'tinder_app/index.html', context = {})
-        elif request.user.is_staff:
+        if request.user.is_staff:
             return render(request, 'tinder_app/admin_index.html', context={})
         else:
             profile = Profile.objects.get(user=request.user)
             profiles = get_profiles(profile)
             check_reciprocites(profile)
-
-            return render(request, 'tinder_app/index.html', context = {'profiles': profiles})
-
-    def post(self, request):
-        if 'unlike' in request.POST:
-            print('Не нравится')
-            profile = Profile.objects.get(user=request.user)
-            profile_to = Profile.objects.get(nickname=request.POST.get('unlike'))
-            UnLike.objects.create(user_from=profile, user_to=profile_to)
-            profiles = get_profiles(profile)
-            context = {'profiles': profiles}
-            return HttpResponseRedirect('/')
-        elif 'like' in request.POST:
-            print('Нравится')
-            profile = Profile.objects.get(user=request.user)
-            profile_to = Profile.objects.get(nickname=request.POST.get('like'))
-            if Like.objects.filter(user_from = profile_to, user_to = profile).exists():
-                print("есть лайк")
-                Like.objects.create(user_from=profile, user_to=profile_to)
-                Reciprocity.objects.create(user_1=profile, user_2=profile_to)
-                Chat.objects.create(member_1 = profile, member_2  = profile_to)
-                print("чат создан!")
-
-            else:
-                Like.objects.create(user_from=profile, user_to=profile_to)
-            profiles = get_profiles(profile)
-
-            return HttpResponseRedirect('/')
+            return render(request, 'tinder_app/index.html', context={'profiles': profiles})
 
 
-class ProfileLikes(View):
+class ProfileLikes(LoginRequiredMixin, View):
     def get(self, request):
         profile = Profile.objects.get(user=request.user)
         likes = Like.objects.filter(user_from = profile)
@@ -61,7 +32,32 @@ class ProfileLikes(View):
         return render(request, 'tinder_app/profile_likes.html', context)
 
 
-class ProfileSympathy(View):
+class AddLike(LoginRequiredMixin, View):
+    def post(self, request, profile_to):
+        profile = Profile.objects.get(user=request.user)
+        profile_to = Profile.objects.get(nickname=profile_to)
+        if Like.objects.filter(user_from=profile_to, user_to=profile).exists():
+            print("есть лайк")
+            Like.objects.create(user_from=profile, user_to=profile_to)
+            Reciprocity.objects.create(user_1=profile, user_2=profile_to)
+            Chat.objects.create(member_1=profile, member_2=profile_to)
+            print("чат создан!")
+        else:
+            Like.objects.create(user_from=profile, user_to=profile_to)
+        return redirect('index')
+
+
+class AddUnLike(LoginRequiredMixin, View):
+    def post(self, request, profile_to):
+        profile = Profile.objects.get(user=request.user)
+        print('Не нравится')
+        # profile = Profile.objects.get(user=request.user)
+        profile_to = Profile.objects.get(nickname=profile_to)
+        UnLike.objects.create(user_from=profile, user_to=profile_to)
+        return redirect('index')
+
+
+class ProfileSympathy(LoginRequiredMixin, View):
     def get(self, request):
         profile = Profile.objects.get(user=request.user)
         likes = Like.objects.filter(user_to=profile)
@@ -79,10 +75,10 @@ class ProfileSympathy(View):
             Chat.objects.create(member_1 = profile, member_2 = like.user_from)
             Like.objects.get(id = request.POST.get('sympathy')).delete()
             context = {'likes': likes}
-            return render(request, 'tinder_app/profile_sympathy.html', context)
+            return redirect('likes')
 
 
-class ProfileReciprocites(View):
+class ProfileReciprocites(LoginRequiredMixin, View):
     def get(self, request):
         profile = Profile.objects.get(user=request.user)
         reciprocites = Reciprocity.objects.filter(Q(user_1 = profile) | Q(user_2 = profile))
@@ -90,7 +86,7 @@ class ProfileReciprocites(View):
         return render(request, 'tinder_app/profile_reciprocites.html', context)
 
 
-class ChatList(View):
+class ChatList(LoginRequiredMixin, View):
     def get(self, request):
         profile = Profile.objects.get(user = request.user)
         chats = Chat.objects.filter(Q(member_1 = profile) | Q(member_2 = profile))
@@ -101,8 +97,7 @@ class ChatList(View):
         return render(request, 'tinder_app/chat_list.html', context)
 
 
-
-class ChatWithRec(View):
+class ChatWithRec(LoginRequiredMixin, View):
     def get(self, request, id):
         message_form = MessageForm()
         profile = Profile.objects.get(user = request.user)
@@ -134,7 +129,7 @@ class ChatWithRec(View):
         return render(request, 'tinder_app/chat.html', context)
 
 
-class DeleteMessage(View):
+class DeleteMessage(LoginRequiredMixin, View):
     def get(self, request, message_id):
         profile = Profile.objects.get(user=request.user)
         message_to_del = get_object_or_404(Message, id = message_id, author = profile)
@@ -156,7 +151,7 @@ class DeleteMessage(View):
         return redirect(chat.get_absolute_url())
 
 
-class DeleteLike(View):
+class DeleteLike(LoginRequiredMixin, View):
     def post(self, request, id):
         like = Like.objects.get(id = id)
         print(like)
@@ -167,14 +162,14 @@ class DeleteLike(View):
         return HttpResponseRedirect('/')
 
 
-class OwnProfile(View):
+class OwnProfile(LoginRequiredMixin, View):
     def get(self, request):
         profile = Profile.objects.get(user = request.user)
         context = {'profile': profile}
         return render(request, 'auth/own_profile.html', context)
 
 
-class ProfilesList(View):
+class ProfilesList(LoginRequiredMixin, View):
     def get(self, request):
         profiles = Profile.objects.all()
 
@@ -182,63 +177,12 @@ class ProfilesList(View):
         return render(request, 'tinder_app/profile_list.html', context)
 
 
-class LoginView(View):
+class NearProfiles(LoginRequiredMixin, View):
     def get(self, request):
-        login_form = LoginForm()
-        context = {'form': login_form}
-        return render(request, 'auth/login.html', context)
+        profile = Profile.objects.get(user=request.user)
+        cities_and_distance, profiles = get_near_profiles(profile)[0], get_near_profiles(profile)[1]
+        print(cities_and_distance, profiles)
+        return render(request, 'tinder_app/near_profiles_list.html', context = {
+            'cities_and_distance': cities_and_distance, 'profiles': profiles
+        })
 
-    def post(self, request):
-        login_form = LoginForm(request.POST)
-        if login_form.is_valid():
-
-            username = login_form.cleaned_data['username']
-            password = login_form.cleaned_data['password']
-
-            user = authenticate(username=username, password=password)
-
-            if user:
-                login(request, user)
-                return redirect('index')
-        return render(request, 'auth/login.html', context={'form': login_form})
-
-
-class RegisterView(View):
-    def get(self, request):
-        register_form = RegisterForm()
-
-        cities = []
-        with open('C:/Users/amate/python/tinder_project/tinder/tinder_app/templates/auth/by-cities.json', encoding='UTF-8') as file:
-            data = json.load(file)
-            for i in range(0, 6):
-
-                for city in data[0]['regions'][i]['cities']:
-                    cities.append(city['name'])
-
-        context = {'form': register_form, 'city_list': cities}
-        return render(request, 'auth/registration.html', context)
-
-    def post(self, request):
-        register_form = RegisterForm(request.POST)
-        if register_form.is_valid():
-            new_user = register_form.save(commit=False)
-            new_user.username = register_form.cleaned_data['username']
-            new_user.email = register_form.cleaned_data['email']
-            new_user.first_name = register_form.cleaned_data['firstname']
-            new_user.last_name = register_form.cleaned_data['lastname']
-            new_user.save()
-            new_user.set_password(register_form.cleaned_data['password'])
-            new_user.save()
-            request.POST.getlist('services')
-            Profile.objects.create(user = new_user, nickname = new_user.username,
-                                   firstname = register_form.cleaned_data['firstname'],
-                                   lastname = register_form.cleaned_data['lastname'],
-                                   location = request.POST.getlist('cities')[0],
-                                   type = register_form.cleaned_data['type'])
-            user = authenticate(username=register_form.cleaned_data['username'],
-                                password=register_form.cleaned_data['password'])
-            login(request, user)
-            return redirect('index')
-        print(register_form.errors)
-        context = {'form': register_form}
-        return redirect('registration')

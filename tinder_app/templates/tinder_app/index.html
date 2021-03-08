@@ -1,13 +1,12 @@
 {% extends 'layout/base.html' %}
 {% block content %}
 {% if request.user.is_authenticated %}
-<div class="container">
-  {% for profile in profiles %}
+{% if profiles %}
+{% for profile in profiles %}
 <div class="card" style="width: 18rem;">
-<!--    {% for im in profile.profilephoto.all %}-->
-<!--  <img src="{{ im.image.url }}" class="card-img-top" alt="Картинка не найдена" width="90" height="400">-->
-<!--    {% endfor %}-->
+  {% if profile.main_photo %}
   <img src="{{ profile.main_photo.url }}" class="card-img-top" alt="Картинка не найдена">
+  {% endif %}
   <div class="card-body">
     <h5 class="card-title">{{profile.nickname}}</h5>
     {% if profile.description %}
@@ -22,15 +21,30 @@
     <li class="list-group-item">Местоположение: {{profile.location}}</li>
   </ul>
   <div class="card-body">
-    <form action="" method="post">
+    <div class="card-body">
+    <form action="{% url 'add_like' profile.nickname %}" method="post">
       {% csrf_token %}
-      <button type="submit" class="btn btn-danger" name="unlike" value="{{ profile.nickname }}">Не нравится</button>
-      <button type="submit" class="btn btn-primary" name="like" value="{{ profile.nickname }}">Нравится</button>
+      <button type="submit" class="btn btn-primary">Нравится</button>
+    </form>
+    <br>
+    <form action="{% url 'add_unlike' profile.nickname %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Не нравится</button>
     </form>
   </div>
+  </div>
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-danger" role="alert">
+  {{ message }}
+  </div>
+  {% endfor %}
+  {% endif %}
 </div>
   {% endfor %}
-  </div>
+{% else %}
+<h2>На сегодня профилей нет</h2>
+{% endif %}
 {% else %}
 <h2><a href="{% url 'login' %}">Войдите</a> или <a href="{% url 'registration' %}">зарегестрируйтесь</a></h2>
 {% endif %}

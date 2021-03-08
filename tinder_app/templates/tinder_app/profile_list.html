@@ -6,7 +6,7 @@
 <div class="container">
   {% for profile in profiles %}
 <div class="card" style="width: 18rem;">
-  <img src="{{ profile.main_photo.url }}" class="card-img-top" alt="Картинка не найдена"">
+  <img src="{{ profile.main_photo.url }}" class="card-img-top" alt="Картинка не найдена">
   <div class="card-body">
     <h5 class="card-title">{{profile.nickname}}</h5>
     {% if profile.description %}

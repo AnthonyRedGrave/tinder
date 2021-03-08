@@ -14,7 +14,7 @@ class ProfilePhotoInline(admin.StackedInline):
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'nickname', 'firstname', 'lastname', 'location', 'description', 'type', 'get_image']
+    list_display = ['user', 'nickname', 'firstname', 'lastname', 'location', 'description', 'type', 'sub_type', 'get_image']
     inlines = [ProfilePhotoInline]
     # readonly_fields = ('get_image',)
 

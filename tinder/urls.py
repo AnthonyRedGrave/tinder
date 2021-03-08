@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('tinder_app.urls')),
     path('api/', include('tinder_api.urls')),
+    path('auth/', include('tinder_auth.urls')),
 ]
 
 if settings.DEBUG:
